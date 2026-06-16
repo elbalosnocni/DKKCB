@@ -60,8 +60,28 @@
 
 <script>
   // 🔴 THAY LINK WEB APP (MÃ TRIỂN KHAI CỦA BẠN VÀO ĐÂY)
-  const API_URL = "https://script.google.com/macros/s/AKfycbyHKr32h5l-H4hBeWzmeu1NnMW6jOEw66dvmPePLmvdbLJXnoj6vgf21g1z1OZdM86hJQ/exec?callback=?"; 
-
+  const API_URL = "https://script.google.com/macros/s/AKfycbyHKr32h5l-H4hBeWzmeu1NnMW6jOEw66dvmPePLmvdbLJXnoj6vgf21g1z1OZdM86hJQ/exec"; 
+$(document).ready(function() {
+  $.ajax({
+    url: API_URL,
+    dataType: "jsonp",
+    jsonp: "callback", // Ép jQuery gửi tham số dạng ?callback=
+    success: function(data) {
+      if (data.error) {
+        $("#loading").html('<span class="text-danger">Lỗi dữ liệu Sheet: ' + data.error + '</span>');
+        return;
+      }
+      db = data;
+      $("#loading").hide();
+      $("#formDangKy").fadeIn();
+      initAutocompletes();
+    },
+    error: function(xhr, status, error) {
+      $("#loading").html('<span class="text-danger">Không thể kết nối với Google API. Hãy kiểm tra lại link Web App!</span>');
+      console.log("Chi tiết lỗi:", error);
+    }
+  });
+});
   let db = { dscnv: [], dkcu: {}, benhvien: [] };
   let selectedNV = null;
   let selectedBV = null;
