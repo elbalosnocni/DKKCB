@@ -107,6 +107,17 @@
       },
       select: function(event, ui) {
         selectedNV = ui.item.obj;
+        
+        // KIỂM TRA NẾU ĐÃ ĐĂNG KÝ RỒI
+        if (selectedNV.daDK) {
+          alert("❌ Nhân viên này đã thực hiện đăng ký đổi nơi KCB trước đó rồi!");
+          $("#inputNV").val(""); // Xóa dữ liệu vừa nhập
+          $("#boxNV").slideUp();
+          selectedNV = null;
+          checkValid();
+          return false;
+        }
+
         let keyCu = selectedNV.hoten.trim().toUpperCase();
         let kcbCu = db.dkcu[keyCu] || "Không tìm thấy thông tin KCB cũ (Đăng ký mới)";
         
@@ -119,11 +130,14 @@
       }
     });
 
-    // Autocomplete cho Bệnh Viện
+    // Autocomplete cho Bệnh Viện (Đã lọc bỏ bệnh viện đóng cửa)
     $("#inputBV").autocomplete({
       source: function(request, response) {
         let term = removeVietnameseTones(request.term);
-        let matches = db.benhvien.filter(bv => removeVietnameseTones(bv.tenbv).indexOf(term) !== -1);
+        
+        // Chỉ giữ lại những bệnh viện KHÔNG bị đóng cửa (dongCua !== true)
+        let matches = db.benhvien.filter(bv => !bv.dongCua && removeVietnameseTones(bv.tenbv).indexOf(term) !== -1);
+        
         response(matches.map(bv => ({ label: `${bv.tenbv} (${bv.mabv})`, value: bv.tenbv, obj: bv })));
       },
       select: function(event, ui) {
