@@ -1,70 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-<meta charset="utf-8">
-
-<title>Đăng ký KCB BHYT</title>
-
-<style>
-
-body{
-font-family:Arial;
-max-width:900px;
-margin:auto;
-padding:20px;
-}
-
-input{
-width:100%;
-padding:10px;
-margin:5px 0;
-}
-
-.box{
-border:1px solid #ddd;
-padding:15px;
-margin-top:10px;
-}
-
-button{
-padding:12px 20px;
-background:#0b7dda;
-color:white;
-border:none;
-cursor:pointer;
-}
-
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Ký Đổi Nơi KCB Ban Đầu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  
+  <style>
+    body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .ui-autocomplete { max-height: 250px; overflow-y: auto; overflow-x: hidden; z-index: 9999; }
+    .info-box { background-color: #e9ecef; border-left: 4px solid #0d6efd; padding: 10px; border-radius: 4px; display: none; }
+    .bv-box { background-color: #e8f5e9; border-left: 4px solid #2e7d32; padding: 10px; border-radius: 4px; display: none; }
+  </style>
 </head>
-
 <body>
 
-<h2>ĐĂNG KÝ ĐỔI NƠI KCB BAN ĐẦU</h2>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card p-4">
+        <h3 class="text-center text-primary mb-4">ĐĂNG KÝ ĐỔI NƠI KCB BAN ĐẦU</h3>
+        
+        <div id="loading" class="text-center text-muted my-3">
+          <div class="spinner-border text-primary spinner-border-sm" role="status"></div> Đang tải dữ liệu hệ thống...
+        </div>
 
-<label>Họ tên nhân viên</label>
+        <form id="formDangKy" style="display:none;">
+          <div class="mb-4">
+            <label class="form-label fw-bold text-secondary">1. Nhập Họ và Tên nhân viên:</label>
+            <input type="text" id="inputNV" class="form-control form-control-lg" placeholder="Gõ tên để tìm kiếm (không dấu hoặc có dấu)..." autocomplete="off">
+            <div id="boxNV" class="info-box mt-3">
+              <p class="mb-1"><strong>Mã số NV:</strong> <span id="lblMaNV"></span></p>
+              <p class="mb-1"><strong>Bộ phận:</strong> <span id="lblBoPhan"></span> | <strong>Chức vụ:</strong> <span id="lblChucVu"></span></p>
+              <p class="mb-0 text-danger"><strong>Nơi ĐK KCB Hiện Tại:</strong> <span id="lblKCBCu"></span></p>
+            </div>
+          </div>
 
-<input id="tennv" list="dsnv">
+          <div class="mb-4">
+            <label class="form-label fw-bold text-secondary">2. Chọn Bệnh viện đăng ký mới:</label>
+            <input type="text" id="inputBV" class="form-control form-control-lg" placeholder="Gõ tên bệnh viện để tìm kiếm..." autocomplete="off">
+            <div id="boxBV" class="bv-box mt-3">
+              <p class="mb-1"><strong>Mã Bệnh Viện:</strong> <span id="lblMaBV" class="badge bg-success fs-6"></span></p>
+              <p class="mb-1"><strong>Đăng ký ban đầu:</strong> <span id="lblDKBanDau"></span></p>
+              <p class="mb-1"><strong>Địa chỉ:</strong> <span id="lblDiaChi"></span></p>
+              <p class="mb-0 text-muted"><i><strong>Ghi chú:</strong> <span id="lblGhiChu"></span></i></p>
+            </div>
+          </div>
 
-<datalist id="dsnv"></datalist>
+          <button type="button" id="btnSubmit" class="btn btn-primary btn-lg w-100 mt-3" disabled>Xác Nhận Đăng Ký</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
-<div class="box" id="ttnv"></div>
+<script>
+  // 🔴 THAY LINK WEB APP (MÃ TRIỂN KHAI CỦA BẠN VÀO ĐÂY)
+  const API_URL = "https://script.google.com/macros/s/AKfycbyHKr32h5l-H4hBeWzmeu1NnMW6jOEw66dvmPePLmvdbLJXnoj6vgf21g1z1OZdM86hJQ/exec"; 
 
-<hr>
+  let db = { dscnv: [], dkcu: {}, benhvien: [] };
+  let selectedNV = null;
+  let selectedBV = null;
 
-<label>Bệnh viện đăng ký mới</label>
+  // Hàm loại bỏ dấu tiếng Việt để tìm kiếm thông minh
+  function removeVietnameseTones(str) {
+    if (!str) return "";
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d").replace(/Đ/g, "D")
+      .replace(/[^a-zA-Z0-9 ]/g, "").toLowerCase().trim();
+  }
 
-<input id="benhvien" list="dsbv">
+  // Tải dữ liệu từ Google Sheet khi mở trang web
+  $(document).ready(function() {
+    $.getJSON(API_URL, function(data) {
+      db = data;
+      $("#loading").hide();
+      $("#formDangKy").fadeIn();
+      initAutocompletes();
+    }).fail(function() {
+      $("#loading").html('<span class="text-danger">Không thể tải dữ liệu. Vui lòng kiểm tra lại cấu hình API!</span>');
+    });
+  });
 
-<datalist id="dsbv"></datalist>
+  function initAutocompletes() {
+    // Autocomplete cho Nhân Viên
+    $("#inputNV").autocomplete({
+      source: function(request, response) {
+        let term = removeVietnameseTones(request.term);
+        let matches = db.dscnv.filter(nv => removeVietnameseTones(nv.hoten).indexOf(term) !== -1);
+        response(matches.map(nv => ({ label: `${nv.hoten} (${nv.manv} - ${nv.bophan})`, value: nv.hoten, obj: nv })));
+      },
+      select: function(event, ui) {
+        selectedNV = ui.item.obj;
+        let keyCu = selectedNV.hoten.trim().toUpperCase();
+        let kcbCu = db.dkcu[keyCu] || "Không tìm thấy thông tin KCB cũ (Đăng ký mới)";
+        
+        $("#lblMaNV").text(selectedNV.manv);
+        $("#lblBoPhan").text(selectedNV.bophan);
+        $("#lblChucVu").text(selectedNV.chucvu);
+        $("#lblKCBCu").text(kcbCu);
+        $("#boxNV").slideDown();
+        checkValid();
+      }
+    });
 
-<div class="box" id="ttbv"></div>
+    // Autocomplete cho Bệnh Viện
+    $("#inputBV").autocomplete({
+      source: function(request, response) {
+        let term = removeVietnameseTones(request.term);
+        let matches = db.benhvien.filter(bv => removeVietnameseTones(bv.tenbv).indexOf(term) !== -1);
+        response(matches.map(bv => ({ label: `${bv.tenbv} (${bv.mabv})`, value: bv.tenbv, obj: bv })));
+      },
+      select: function(event, ui) {
+        selectedBV = ui.item.obj;
+        $("#lblMaBV").text(selectedBV.mabv);
+        $("#lblDKBanDau").text(selectedBV.dk_bandau);
+        $("#lblDiaChi").text(selectedBV.diachi);
+        $("#lblGhiChu").text(selectedBV.ghichu || "Không có");
+        $("#boxBV").slideDown();
+        checkValid();
+      }
+    });
+  }
 
-<br>
+  function checkValid() {
+    if (selectedNV && selectedBV) {
+      $("#btnSubmit").removeAttr("disabled");
+    } else {
+      $("#btnSubmit").attr("disabled", "disabled");
+    }
+  }
 
-<button onclick="gui()">GỬI ĐĂNG KÝ</button>
+  // Gửi dữ liệu đăng ký qua lệnh POST
+  $("#btnSubmit").click(function() {
+    if (!selectedNV || !selectedBV) return;
 
-<script src="app.js"></script>
+    let targetBtn = $(this);
+    targetBtn.html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...').attr("disabled", "disabled");
+
+    let payload = {
+      hoten: selectedNV.hoten,
+      manv: selectedNV.manv,
+      bophan: selectedNV.bophan,
+      chucvu: selectedNV.chucvu,
+      kcbcu: $("#lblKCBCu").text(),
+      bvmoi: selectedBV.tenbv,
+      mabv: selectedBV.mabv
+    };
+
+    $.ajax({
+      url: API_URL,
+      type: "POST",
+      dataType: "text",
+      data: JSON.stringify(payload),
+      success: function(response) {
+        if (response.trim() === "OK") {
+          alert("🎉 Chúc mừng! Bạn đã đăng ký đổi nơi KCB thành công.");
+          location.reload(); // Reset lại form
+        } else {
+          alert("Lỗi từ hệ thống: " + response);
+          targetBtn.text("Xác Nhận Đăng Ký").removeAttr("disabled");
+        }
+      },
+      error: function() {
+        alert("Không thể kết nối đến máy chủ Google Sheets. Vui lòng thử lại!");
+        targetBtn.text("Xác Nhận Đăng Ký").removeAttr("disabled");
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
