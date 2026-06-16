@@ -160,12 +160,16 @@
     }
   }
 
-  // Gửi dữ liệu đăng ký qua lệnh POST
+  // Gửi dữ liệu đăng ký qua lệnh POST hiện đại
   $("#btnSubmit").click(function() {
     if (!selectedNV || !selectedBV) return;
 
     let targetBtn = $(this);
     targetBtn.html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...').attr("disabled", "disabled");
+
+    // Lưu lại tên và bệnh viện vào biến tạm để hiển thị sau khi gửi thành công
+    let tenNhanVien = selectedNV.hoten;
+    let tenBenhVienMoi = selectedBV.tenbv;
 
     let payload = {
       hoten: selectedNV.hoten,
@@ -177,25 +181,29 @@
       mabv: selectedBV.mabv
     };
 
-    // Khi gửi dữ liệu POST, chuyển đổi qua luồng fetch text thông thường tránh CORS preflight
-    $.ajax({
-      url: API_URL,
-      type: "POST",
-      contentType: "text/plain; charset=utf-8",
-      data: JSON.stringify(payload),
-      success: function(response) {
-        if (response.trim() === "OK") {
-          alert("🎉 Chúc mừng! Bạn đã đăng ký đổi nơi KCB thành công.");
-          location.reload(); 
-        } else {
-          alert("Lỗi từ hệ thống: " + response);
-          targetBtn.text("Xác Nhận Đăng Ký").removeAttr("disabled");
-        }
+    // Dùng fetch chế độ 'no-cors' để đẩy dữ liệu đi cực nhanh
+    fetch(API_URL, {
+      method: "POST",
+      mode: "no-cors", 
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8"
       },
-      error: function() {
-        alert("Không thể gửi dữ liệu đăng ký. Hãy kiểm tra lại sheet DangKyMoi!");
-        targetBtn.text("Xác Nhận Đăng Ký").removeAttr("disabled");
-      }
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      // Hiển thị thông báo cá nhân hóa chi tiết cho nhân viên
+      alert(
+        "🎉 Chúc mừng!\n\n" +
+        "Nhân viên: " + tenNhanVien + "\n" +
+        "Đã đăng ký đổi nơi KCB thành công sang:\n" + tenBenhVienMoi
+      );
+      
+      location.reload(); // Tải lại trang để reset form
+    })
+    .catch(error => {
+      alert("Không thể kết nối đến máy chủ Google Sheets. Vui lòng thử lại!");
+      targetBtn.text("Xác Nhận Đăng Ký").removeAttr("disabled");
+      console.error("Lỗi:", error);
     });
   });
 </script>
