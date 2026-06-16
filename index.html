@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<title>Đăng ký KCB BHYT</title>
+
+<style>
+
+body{
+font-family:Arial;
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:5px 0;
+}
+
+.box{
+border:1px solid #ddd;
+padding:15px;
+margin-top:10px;
+}
+
+button{
+padding:12px 20px;
+background:#0b7dda;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>ĐĂNG KÝ ĐỔI NƠI KCB BAN ĐẦU</h2>
+
+<label>Họ tên nhân viên</label>
+
+<input id="tennv" list="dsnv">
+
+<datalist id="dsnv"></datalist>
+
+<div class="box" id="ttnv"></div>
+
+<hr>
+
+<label>Bệnh viện đăng ký mới</label>
+
+<input id="benhvien" list="dsbv">
+
+<datalist id="dsbv"></datalist>
+
+<div class="box" id="ttbv"></div>
+
+<br>
+
+<button onclick="gui()">GỬI ĐĂNG KÝ</button>
+
+<script src="app.js"></script>
+
+</body>
+</html>
