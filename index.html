@@ -162,13 +162,14 @@
       .replace(/[^a-zA-Z0-9 ]/g, "").toLowerCase().trim();
   }
 
-  // Tải cấu hình và DB ban đầu
+  // Tải cấu hình và DB ban đầu bằng Fetch thay thế cho $.ajax JSONP cũ
   $(document).ready(function() {
-    $.ajax({
-      url: API_URL,
-      dataType: "jsonp",
-      jsonp: "callback",
-      success: function(data) {
+    fetch(API_URL)
+      .then(response => {
+        if (!response.ok) throw new Error("Mạng không ổn định");
+        return response.json();
+      })
+      .then(data => {
         if (data.error) {
           $("#loading").html('<span class="text-danger">Lỗi hệ thống: ' + data.error + '</span>');
           return;
@@ -196,11 +197,11 @@
 
         $("#formDangKy").fadeIn();
         initAutocompletes();
-      },
-      error: function() {
+      })
+      .catch(error => {
+        console.error(error);
         $("#loading").html('<span class="text-danger">Không thể đồng bộ dữ liệu. Hãy tải lại trang!</span>');
-      }
-    });
+      });
   });
 
   function initAutocompletes() {
@@ -279,7 +280,7 @@
     });
   });
 
-  // XỬ LÝ ĐĂNG NHẬP ADMIN BẰNG ĐIỆN THOẠI
+  // XỬ LÝ ĐĂNG NHẬP ADMIN BẰNG FETCH POST
   $("#btnLoginSubmit").click(function() {
     let u = $("#adminUser").val();
     let p = $("#adminPass").val();
@@ -288,48 +289,50 @@
     let btn = $(this);
     btn.html('<span class="spinner-border spinner-border-sm"></span> Đang xác thực...').attr("disabled", "disabled");
 
-    $.ajax({
-      url: API_URL,
-      dataType: "jsonp",
-      jsonp: "callback",
-      data: { action: "adminLogin", u: u, p: p },
-      success: function(res) {
-        btn.text("Đăng nhập").removeAttr("disabled");
-        if(res.success) {
-          // Đăng nhập đúng -> Ẩn toàn bộ form ngoài, hiện Dashboard quản trị
-          $('#loginModal').modal('hide');
-          $("#mainContainer").hide();
-          $("#boxHetHan").hide();
-          $("#adminDashboard").fadeIn();
-          
-          // Điền thời gian hiện tại vào ô chỉnh sửa hạn
-          if(res.thoiHan) {
-             let dFormated = new Date(res.thoiHan.toString().replace(" ", "T"));
-             dFormated.setMinutes(dFormated.getMinutes() - dFormated.getTimezoneOffset());
-             $("#inputNewDate").val(dFormated.toISOString().slice(0,16));
-          }
-
-          // Hiển thị danh sách nhân viên đã đăng ký lên table
-          $("#totalReg").text(res.list.length);
-          let html = "";
-          if(res.list.length === 0) {
-            html = '<tr><td colspan="5" class="text-center">Chưa có ai đăng ký</td></tr>';
-          } else {
-            res.list.forEach(item => {
-              html += `<tr>
-                <td>${item.tg}</td>
-                <td>${item.manv}</td>
-                <td class="fw-bold">${item.hoten}</td>
-                <td>${item.bophan}</td>
-                <td>${item.bvmoi}</td>
-              </tr>`;
-            });
-          }
-          $("#tableBodyAdmin").html(html);
-        } else {
-          alert("❌ " + res.msg);
+    fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "adminLogin", u: u, p: p })
+    })
+    .then(response => response.json())
+    .then(res => {
+      btn.text("Đăng nhập").removeAttr("disabled");
+      
+      if(res.success) {
+        $('#loginModal').modal('hide');
+        $("#mainContainer").hide();
+        $("#boxHetHan").hide();
+        $("#adminDashboard").fadeIn();
+        
+        if(res.thoiHan) {
+           let dFormated = new Date(res.thoiHan.toString().replace(" ", "T"));
+           dFormated.setMinutes(dFormated.getMinutes() - dFormated.getTimezoneOffset());
+           $("#inputNewDate").val(dFormated.toISOString().slice(0,16));
         }
+
+        $("#totalReg").text(res.list.length);
+        let html = "";
+        if(res.list.length === 0) {
+          html = '<tr><td colspan="5" class="text-center">Chưa có ai đăng ký</td></tr>';
+        } else {
+          res.list.forEach(item => {
+            html += `<tr>
+              <td>${item.tg}</td>
+              <td>${item.manv}</td>
+              <td class="fw-bold">${item.hoten}</td>
+              <td>${item.bophan}</td>
+              <td>${item.bvmoi}</td>
+            </tr>`;
+          });
+        }
+        $("#tableBodyAdmin").html(html);
+      } else {
+        alert("❌ " + res.msg);
       }
+    })
+    .catch(error => {
+      btn.text("Đăng nhập").removeAttr("disabled");
+      alert("❌ Lỗi kết nối mạng hoặc phiên bản Web App chưa được cập nhật mới!");
+      console.error(error);
     });
   });
 
@@ -341,7 +344,6 @@
     let btn = $(this);
     btn.html('<span class="spinner-border spinner-border-sm"></span>').attr("disabled", "disabled");
     
-    // Đổi định dạng ISO của input về định dạng YYYY-MM-DD HH:mm:ss của Sheet
     let d = new Date(newDateVal);
     let formattedDate = d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":00";
 
