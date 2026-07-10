@@ -10,6 +10,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   
   <style>
     body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -22,13 +23,20 @@
     .bv-box { background-color: #f0fdf4; border-left: 5px solid #22c55e; padding: 12px; border-radius: 8px; display: none; }
     .expired-box { background-color: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; border-radius: 12px; padding: 20px; text-align: center; display: none; }
     .badge-time { background-color: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; }
+    
+    /* Ẩn phiếu xác nhận ẩn tinh tế hơn để html2canvas vẫn render được chính xác */
+    #confirmCardHiddenWrapper {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+    }
   </style>
 </head>
 <body>
 
 <div class="container py-4" style="max-width: 700px;">
   
-  <!-- Header Banner Giống Giao Diện Mẫu -->
+  <!-- Header Banner -->
   <div class="header-banner text-center mb-4">
     <button class="btn-admin-gear" data-bs-toggle="modal" data-bs-target="#loginModal" title="Quản trị viên">
       <i class="fas fa-gear"></i>
@@ -84,7 +92,7 @@
     </div>
   </div>
 
-  <!-- Màn Hình Dashboard Admin (Ẩn mặc định) -->
+  <!-- Màn Hình Dashboard Admin -->
   <div id="adminDashboard" style="display: none;">
     <div class="card p-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -92,7 +100,6 @@
         <button class="btn btn-sm btn-outline-danger" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> Thoát</button>
       </div>
       
-      <!-- Box Sửa Hạn Đăng Ký Trực Quan -->
       <div class="p-3 bg-light rounded-3 mb-4 border">
         <label class="form-label fw-bold small text-secondary"><i class="far fa-clock me-1"></i>Thay đổi hạn đăng ký hệ thống:</label>
         <div class="input-group">
@@ -101,54 +108,48 @@
         </div>
       </div>
 
-      <!-- KHU VỰC THỐNG KÊ BÁO CÁO SỐ LƯỢNG -->
-<div class="row g-3 mb-4">
-  <!-- Báo cáo theo Bộ phận -->
-  <div class="col-md-6">
-    <div class="card shadow-sm border-0">
-      <div class="card-header bg-primary text-white py-2">
-        <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Số lượng đăng ký theo Bộ phận</h6>
-      </div>
-      <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
-        <table class="table table-hover table-striped mb-0 text-center table-bordered">
-          <thead class="table-light sticky-top">
-            <tr>
-              <th>Tên Bộ Phận</th>
-              <th style="width: 120px;">Số người đk</th>
-            </tr>
-          </thead>
-          <tbody id="reportBoPhanBody">
-            <!-- Dữ liệu tự động điền -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+      <div class="row g-3 mb-4">
+        <!-- Báo cáo theo Bộ phận -->
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-2">
+              <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Số lượng đăng ký theo Bộ phận</h6>
+            </div>
+            <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
+              <table class="table table-hover table-striped mb-0 text-center table-bordered">
+                <head class="table-light sticky-top">
+                  <tr>
+                    <th>Tên Bộ Phận</th>
+                    <th style="width: 120px;">Số người đk</th>
+                  </tr>
+                </head>
+                <tbody id="reportBoPhanBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-  <!-- Báo cáo theo Bệnh viện -->
-  <div class="col-md-6">
-    <div class="card shadow-sm border-0">
-      <div class="card-header bg-success text-white py-2">
-        <h6 class="mb-0"><i class="fas fa-hospital me-2"></i>Số lượng đăng ký theo Bệnh viện</h6>
+        <!-- Báo cáo theo Bệnh viện -->
+        <div class="col-md-6">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white py-2">
+              <h6 class="mb-0"><i class="fas fa-hospital me-2"></i>Số lượng đăng ký theo Bệnh viện</h6>
+            </div>
+            <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
+              <table class="table table-hover table-striped mb-0 text-center table-bordered">
+                <head class="table-light sticky-top">
+                  <tr>
+                    <th>Tên Bệnh Viện</th>
+                    <th style="width: 120px;">Số người đk</th>
+                  </tr>
+                </head>
+                <tbody id="reportBenhVienBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
-        <table class="table table-hover table-striped mb-0 text-center table-bordered">
-          <thead class="table-light sticky-top">
-            <tr>
-              <th>Tên Bệnh Viện</th>
-              <th style="width: 120px;">Số người đk</th>
-            </tr>
-          </thead>
-          <tbody id="reportBenhVienBody">
-            <!-- Dữ liệu tự động điền -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
       
-      <!-- Danh Sách Đã Đăng Ký Thực Tế -->
       <h6 class="fw-bold mb-2">Danh sách nhân viên đã Đăng ký (<span id="totalReg">0</span>)</h6>
       <div class="table-responsive" style="max-height: 350px;">
         <table class="table table-sm table-striped table-bordered small text-nowrap">
@@ -174,7 +175,7 @@
 <!-- Modal Đăng Nhập Quản Trị -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content style-modal" style="border-radius: 16px;">
+    <div class="modal-content" style="border-radius: 16px;">
       <div class="modal-header border-0 pb-0">
         <h5 class="modal-title fw-bold w-100 text-center mt-2">Đăng nhập quản trị</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -194,8 +195,25 @@
   </div>
 </div>
 
+<!-- Đặt phần wrapper ẩn cho thẻ confirmCard -->
+<div id="confirmCardHiddenWrapper">
+  <div id="confirmCard" style="width:600px; background:#fff; padding:30px; border:3px solid #0d6efd; border-radius:15px;">
+    <h3 style="text-align:center; color:#0d6efd; margin-top:0;">PHIẾU XÁC NHẬN ĐĂNG KÝ</h3>
+    <hr>
+    <p style="font-size:16px; margin: 10px 0;"><b>Họ tên:</b> <span id="cfHoten"></span></p>
+    <p style="font-size:16px; margin: 10px 0;"><b>Mã NV:</b> <span id="cfMaNV"></span></p>
+    <p style="font-size:16px; margin: 10px 0;"><b>Bộ phận:</b> <span id="cfBoPhan"></span></p>
+    <p style="font-size:16px; margin: 10px 0;"><b>KCB cũ:</b> <span id="cfOld"></span></p>
+    <p style="font-size:16px; margin: 10px 0;"><b>KCB mới:</b> <span id="cfNew"></span></p>
+    <p style="font-size:16px; margin: 10px 0;"><b>Ngày đăng ký:</b> <span id="cfTime"></span></p>
+    <hr>
+    <div style="text-align:center;">
+      <h4 style="color:green; margin-bottom:0;">✔ ĐĂNG KÝ THÀNH CÔNG</h4>
+    </div>
+  </div>
+</div>
+
 <script>
-  // 🔴 URL WEB APP APPS SCRIPT CỦA BẠN (SAU KHI ĐÃ NEW DEPLOYMENT)
   const API_URL = "https://script.google.com/macros/s/AKfycbyHKr32h5l-H4hBeWzmeu1NnMW6jOEw66dvmPePLmvdbLJXnoj6vgf21g1z1OZdM86hJQ/exec"; 
 
   let db = { dscnv: [], dkcu: {}, benhvien: [] };
@@ -209,7 +227,6 @@
       .replace(/[^a-zA-Z0-9 ]/g, "").toLowerCase().trim();
   }
 
-  // Tải cấu hình và DB ban đầu bằng Fetch thay thế cho $.ajax JSONP cũ
   $(document).ready(function() {
     fetch(API_URL)
       .then(response => {
@@ -224,13 +241,11 @@
         db = data;
         $("#loading").hide();
         
-        // KIỂM TRA THỜI HẠN ĐĂNG KÝ
         if (data.thoiHan) {
           let dateStr = data.thoiHan.toString().replace(" ", "T");
           let hanCuoi = new Date(dateStr);
           let homNay = new Date();
           
-          // Định dạng text hiển thị hạn cuối ra màn hình
           let d = new Date(data.thoiHan);
           let fDate = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
           $("#text-han-cuoi").html('<i class="far fa-clock me-1"></i> Hạn cuối: ' + fDate);
@@ -301,33 +316,66 @@
     if (selectedNV && selectedBV) $("#btnSubmit").removeAttr("disabled");
     else $("#btnSubmit").attr("disabled", "disabled");
   }
+  
+  // Viết lại hàm lưu ảnh dùng Promise để đồng bộ hóa với hệ thống
+  function saveCertificate(maNV) {
+    return html2canvas(document.querySelector("#confirmCard"), { scale: 2 })
+      .then(canvas => {
+        let a = document.createElement("a");
+        a.download = "DangKyKCB_" + maNV + ".png";
+        a.href = canvas.toDataURL("image/png");
+        a.click();
+      });
+  }
 
-  // Gửi thông tin Đăng ký của công nhân
+  // Sửa đổi logic gửi thông tin Đăng ký
   $("#btnSubmit").click(function() {
     if (!selectedNV || !selectedBV) return;
     let targetBtn = $(this);
     targetBtn.html('<span class="spinner-border spinner-border-sm"></span> Đang xử lý...').attr("disabled", "disabled");
     
-    let tNV = selectedNV.hoten;
-    let tBV = selectedBV.tenbv;
-
     let payload = {
-      hoten: selectedNV.hoten, manv: selectedNV.manv, bophan: selectedNV.bophan, chucvu: selectedNV.chucvu,
-      kcbcu: $("#lblKCBCu").text(), bvmoi: selectedBV.tenbv, mabv: selectedBV.mabv
+      hoten: selectedNV.hoten, 
+      manv: selectedNV.manv, 
+      bophan: selectedNV.bophan, 
+      chucvu: selectedNV.chucvu,
+      kcbcu: $("#lblKCBCu").text(), 
+      bvmoi: selectedBV.tenbv, 
+      mabv: selectedBV.mabv
     };
 
-    fetch(API_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(payload) })
+    let savedMaNV = selectedNV.manv; // Lưu trữ biến tạm trước khi xử lý bất đồng bộ
+
+    fetch(API_URL, { 
+      method: "POST", 
+      mode: "no-cors", 
+      headers: { "Content-Type": "text/plain" }, 
+      body: JSON.stringify(payload) 
+    })
     .then(() => {
-      alert("🎉 Đăng ký thành công!\nNhân viên: " + tNV + "\nNơi khám mới: " + tBV);
+      let now = new Date();
+      $("#cfHoten").text(payload.hoten);
+      $("#cfMaNV").text(payload.manv);
+      $("#cfBoPhan").text(payload.bophan);
+      $("#cfOld").text(payload.kcbcu);
+      $("#cfNew").text(payload.bvmoi);
+      $("#cfTime").text(now.toLocaleString("vi-VN"));
+
+      // Chờ tạo và tải ảnh xong xuôi rồi mới thông báo và reload trang
+      return saveCertificate(savedMaNV);
+    })
+    .then(() => {
+      alert("✅ Đăng ký thành công!\nPhiếu xác nhận đã được lưu vào thiết bị của bạn.");
       location.reload();
     })
-    .catch(() => {
-      alert("Lỗi kết nối mạng!");
+    .catch((error) => {
+      console.error(error);
+      alert("❌ Lỗi kết nối mạng hoặc không thể xuất phiếu xác nhận!");
       targetBtn.text("Xác Nhận Đăng Ký").removeAttr("disabled");
     });
   });
 
-  // XỬ LÝ ĐĂNG NHẬP ADMIN BẰNG FETCH POST
+  // ĐĂNG NHẬP ADMIN BẰNG FETCH POST
   $("#btnLoginSubmit").click(function() {
     let u = $("#adminUser").val();
     let p = $("#adminPass").val();
@@ -440,6 +488,5 @@
     });
   });
 </script>
-
 </body>
 </html>
