@@ -117,12 +117,12 @@
             </div>
             <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
               <table class="table table-hover table-striped mb-0 text-center table-bordered">
-                <head class="table-light sticky-top">
+                <thead class="table-light sticky-top">
                   <tr>
                     <th>Tên Bộ Phận</th>
                     <th style="width: 120px;">Số người đk</th>
                   </tr>
-                </head>
+                </thead>
                 <tbody id="reportBoPhanBody"></tbody>
               </table>
             </div>
@@ -137,12 +137,12 @@
             </div>
             <div class="card-body p-0" style="max-height: 300px; overflow-y: auto;">
               <table class="table table-hover table-striped mb-0 text-center table-bordered">
-                <head class="table-light sticky-top">
+                <thead class="table-light sticky-top">
                   <tr>
                     <th>Tên Bệnh Viện</th>
                     <th style="width: 120px;">Số người đk</th>
                   </tr>
-                </head>
+                </thead>
                 <tbody id="reportBenhVienBody"></tbody>
               </table>
             </div>
@@ -317,7 +317,6 @@
     else $("#btnSubmit").attr("disabled", "disabled");
   }
   
-  // Viết lại hàm lưu ảnh dùng Promise để đồng bộ hóa với hệ thống
   function saveCertificate(maNV) {
     return html2canvas(document.querySelector("#confirmCard"), { scale: 2 })
       .then(canvas => {
@@ -328,7 +327,6 @@
       });
   }
 
-  // Sửa đổi logic gửi thông tin Đăng ký
   $("#btnSubmit").click(function() {
     if (!selectedNV || !selectedBV) return;
     let targetBtn = $(this);
@@ -344,7 +342,7 @@
       mabv: selectedBV.mabv
     };
 
-    let savedMaNV = selectedNV.manv; // Lưu trữ biến tạm trước khi xử lý bất đồng bộ
+    let savedMaNV = selectedNV.manv;
 
     fetch(API_URL, { 
       method: "POST", 
@@ -361,21 +359,23 @@
       $("#cfNew").text(payload.bvmoi);
       $("#cfTime").text(now.toLocaleString("vi-VN"));
 
-      // Chờ tạo và tải ảnh xong xuôi rồi mới thông báo và reload trang
-      return saveCertificate(savedMaNV);
-    })
-    .then(() => {
-      alert("✅ Đăng ký thành công!\nPhiếu xác nhận đã được lưu vào thiết bị của bạn.");
-      location.reload();
+      // Kích hoạt tiến trình chụp ảnh ngầm ngay
+      saveCertificate(savedMaNV).catch(e => console.log("iOS Download Handled"));
+
+      // Không đợi lệnh tải file của iOS phản hồi (tránh bị block treo trang)
+      // Hiển thị thông báo thành công và reload luôn sau đó
+      setTimeout(() => {
+        alert("✅ Đăng ký hoàn tất!\n\n[Lưu ý trên iPhone]: Nếu có thông báo hỏi tải ảnh, bạn hãy bấm 'Tải về'. Ảnh phiếu sẽ nằm trong ứng dụng 'Tệp' (Files) của máy.");
+        location.reload();
+      }, 800);
     })
     .catch((error) => {
       console.error(error);
-      alert("❌ Lỗi kết nối mạng hoặc không thể xuất phiếu xác nhận!");
+      alert("❌ Lỗi kết nối mạng!");
       targetBtn.text("Xác Nhận Đăng Ký").removeAttr("disabled");
     });
   });
 
-  // ĐĂNG NHẬP ADMIN BẰNG FETCH POST
   $("#btnLoginSubmit").click(function() {
     let u = $("#adminUser").val();
     let p = $("#adminPass").val();
@@ -462,7 +462,6 @@
     });
   });
 
-  // HÀNH ĐỘNG UPDATE THỜI HẠN TỪ DASHBOARD ADMIN
   $("#btnSaveDate").click(function() {
     let newDateVal = $("#inputNewDate").val();
     if(!newDateVal) return alert("Vui lòng chọn ngày giờ hợp lệ!");
