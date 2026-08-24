@@ -1,50 +1,1493 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
 <title>KCB Admin Panel</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+  rel="stylesheet"
+>
+
 <style>
-body{background:#f4f6f9}.sidebar{min-height:100vh;background:#212529;color:#fff}
-.sidebar a{color:#fff;text-decoration:none;display:block;padding:10px}.card{border-radius:12px}
+
+body {
+  background: #f4f6f9;
+}
+
+.sidebar {
+  min-height: 100vh;
+  background: #212529;
+  color: #fff;
+}
+
+.sidebar a {
+  color: #fff;
+  text-decoration: none;
+  display: block;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,.12);
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.stat-card {
+  border-left: 5px solid #0d6efd;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+.upload-box {
+  border: 2px dashed #ced4da;
+  border-radius: 10px;
+  padding: 15px;
+  background: #fafafa;
+}
+
 </style>
+
 </head>
+
+
 <body>
+
 <div class="container-fluid">
+
 <div class="row">
+
+<!-- =====================================================
+     SIDEBAR
+====================================================== -->
+
 <div class="col-md-2 sidebar p-3">
-<h4>KCB Admin</h4><hr>
-<a href="#">📊 Dashboard</a>
-<a href="#">👥 Nhân viên</a>
-<a href="#">🏥 Bệnh viện</a>
-<a href="#">📝 Đăng ký</a>
-<a href="#">⚙️ Cài đặt</a>
-<a href="#">📈 Báo cáo</a>
+
+<h4>KCB Admin</h4>
+
+<hr>
+
+<a href="#dashboard">📊 Dashboard</a>
+
+<a href="#dangky">📝 Đăng ký</a>
+
+<a href="#upload">📁 Upload dữ liệu</a>
+
+<a href="#caidat">⚙️ Cài đặt</a>
+
+<a href="#baocao">📈 Báo cáo</a>
+
 </div>
+
+
+<!-- =====================================================
+     MAIN
+====================================================== -->
+
 <div class="col-md-10 p-4">
-<h2>Dashboard</h2>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<h2 id="dashboard">
+Dashboard
+</h2>
+
+<button
+  class="btn btn-outline-danger"
+  onclick="location.reload()"
+>
+  Đăng xuất
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     THỐNG KÊ
+====================================================== -->
+
 <div class="row g-3">
-<div class="col-md-3"><div class="card p-3"><h6>Tổng NV</h6><h2 id="emp">0</h2></div></div>
-<div class="col-md-3"><div class="card p-3"><h6>Đã đăng ký</h6><h2 id="reg">0</h2></div></div>
-<div class="col-md-3"><div class="card p-3"><h6>Chưa đăng ký</h6><h2 id="remain">0</h2></div></div>
-<div class="col-md-3"><div class="card p-3"><h6>Trạng thái</h6><span class="badge bg-success">OPEN</span></div></div>
+
+<div class="col-md-3">
+
+<div class="card stat-card p-3">
+
+<h6>Tổng NV</h6>
+
+<h2 id="emp">0</h2>
+
 </div>
-<div class="card mt-4 p-3">
-<h4>Cài đặt hệ thống</h4>
+
+</div>
+
+
+<div class="col-md-3">
+
+<div class="card stat-card p-3">
+
+<h6>Đã đăng ký</h6>
+
+<h2 id="reg">0</h2>
+
+</div>
+
+</div>
+
+
+<div class="col-md-3">
+
+<div class="card stat-card p-3">
+
+<h6>Chưa đăng ký</h6>
+
+<h2 id="remain">0</h2>
+
+</div>
+
+</div>
+
+
+<div class="col-md-3">
+
+<div class="card stat-card p-3">
+
+<h6>Trạng thái đăng ký</h6>
+
+<h4>
+<span
+  id="statusBadge"
+  class="badge bg-secondary"
+>
+ĐANG TẢI
+</span>
+</h4>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     CÀI ĐẶT
+====================================================== -->
+
+<div
+  class="card mt-4 p-3"
+  id="caidat"
+>
+
+<h4>
+⚙️ Cài đặt hệ thống
+</h4>
+
 <div class="row">
-<div class="col-md-4"><label>Mở đăng ký</label><input type="datetime-local" class="form-control"></div>
-<div class="col-md-4"><label>Đóng đăng ký</label><input type="datetime-local" class="form-control"></div>
-<div class="col-md-4"><label>Trạng thái</label><select class="form-select"><option>OPEN</option><option>CLOSED</option></select></div>
+
+<div class="col-md-6">
+
+<label class="form-label">
+Hạn cuối đăng ký
+</label>
+
+<input
+  type="datetime-local"
+  id="inputNewDate"
+  class="form-control"
+>
+
 </div>
-<button class="btn btn-primary mt-3">Lưu cài đặt</button>
+
+<div class="col-md-6">
+
+<label class="form-label">
+Trạng thái hiện tại
+</label>
+
+<div class="form-control bg-light">
+
+<span
+  id="statusText"
+>
+Đang kiểm tra...
+</span>
+
 </div>
-<div class="card mt-4 p-3">
-<h4>Danh sách đăng ký</h4>
-<table class="table table-bordered">
-<thead><tr><th>Mã NV</th><th>Họ tên</th><th>BV mới</th><th>Thời gian</th></tr></thead>
-<tbody><tr><td colspan="4" class="text-center">Kết nối Apps Script để tải dữ liệu</td></tr></tbody>
+
+</div>
+
+</div>
+
+<button
+  class="btn btn-primary mt-3"
+  id="btnSaveDate"
+>
+💾 Lưu thời hạn
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     UPLOAD EXCEL
+====================================================== -->
+
+<div
+  class="card mt-4 p-3"
+  id="upload"
+>
+
+<h4>
+📁 Cập nhật dữ liệu bằng Excel
+</h4>
+
+<p class="text-muted small">
+
+File Excel phải giữ đúng cấu trúc cột hiện tại của từng
+sheet.
+
+Upload sẽ <strong>thay toàn bộ dữ liệu cũ</strong> của
+sheet tương ứng.
+
+</p>
+
+
+<div class="row g-3">
+
+
+<!-- DSCNV -->
+
+<div class="col-md-4">
+
+<div class="upload-box">
+
+<h6>👥 DSCNV</h6>
+
+<input
+  type="file"
+  id="fileDSCNV"
+  class="form-control"
+  accept=".xlsx,.xls"
+>
+
+<button
+  class="btn btn-primary w-100 mt-2"
+  onclick="uploadExcel('DSCNV')"
+>
+Upload DSCNV
+</button>
+
+</div>
+
+</div>
+
+
+<!-- BENHVIEN -->
+
+<div class="col-md-4">
+
+<div class="upload-box">
+
+<h6>🏥 Benhvien</h6>
+
+<input
+  type="file"
+  id="fileBenhvien"
+  class="form-control"
+  accept=".xlsx,.xls"
+>
+
+<button
+  class="btn btn-success w-100 mt-2"
+  onclick="uploadExcel('Benhvien')"
+>
+Upload Benhvien
+</button>
+
+</div>
+
+</div>
+
+
+<!-- DKCU -->
+
+<div class="col-md-4">
+
+<div class="upload-box">
+
+<h6>📋 DKCu</h6>
+
+<input
+  type="file"
+  id="fileDKCu"
+  class="form-control"
+  accept=".xlsx,.xls"
+>
+
+<button
+  class="btn btn-warning w-100 mt-2"
+  onclick="uploadExcel('DKCu')"
+>
+Upload DKCu
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     DANH SÁCH ĐĂNG KÝ
+====================================================== -->
+
+<div
+  class="card mt-4 p-3"
+  id="dangky"
+>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<h4 class="mb-0">
+
+📝 Danh sách đăng ký
+
+<span
+  class="badge bg-primary"
+  id="totalReg"
+>
+0
+</span>
+
+</h4>
+
+
+<div>
+
+<button
+  class="btn btn-success me-2"
+  onclick="downloadExcel()"
+>
+⬇️ Lưu Excel
+</button>
+
+
+<button
+  class="btn btn-danger"
+  onclick="deleteAllDangKy()"
+>
+🗑️ Xóa toàn bộ
+</button>
+
+</div>
+
+</div>
+
+
+<div
+  class="table-responsive"
+  style="max-height:500px"
+>
+
+<table
+  class="table table-bordered table-striped table-hover"
+>
+
+<thead class="table-dark sticky-top">
+
+<tr>
+
+<th>STT</th>
+
+<th>Thời gian</th>
+
+<th>Mã NV</th>
+
+<th>Họ tên</th>
+
+<th>Bộ phận</th>
+
+<th>KCB cũ</th>
+
+<th>BV mới</th>
+
+<th>Mã BV</th>
+
+<th>Thao tác</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="tableBodyAdmin">
+
+<tr>
+
+<td
+  colspan="9"
+  class="text-center"
+>
+Đang tải...
+</td>
+
+</tr>
+
+</tbody>
+
 </table>
+
 </div>
-</div></div></div>
-</body></html>
+
+</div>
+
+
+<!-- =====================================================
+     BÁO CÁO
+====================================================== -->
+
+<div
+  class="row g-3 mt-1"
+  id="baocao"
+>
+
+
+<div class="col-md-6">
+
+<div class="card">
+
+<div class="card-header bg-primary text-white">
+
+Số lượng đăng ký theo Bộ phận
+
+</div>
+
+
+<div
+  class="card-body p-0"
+  style="max-height:300px;overflow:auto"
+>
+
+<table class="table table-striped mb-0">
+
+<thead>
+
+<tr>
+
+<th>Bộ phận</th>
+
+<th>Số người</th>
+
+</tr>
+
+</thead>
+
+<tbody id="reportBoPhanBody">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="col-md-6">
+
+<div class="card">
+
+<div class="card-header bg-success text-white">
+
+Số lượng đăng ký theo Bệnh viện
+
+</div>
+
+
+<div
+  class="card-body p-0"
+  style="max-height:300px;overflow:auto"
+>
+
+<table class="table table-striped mb-0">
+
+<thead>
+
+<tr>
+
+<th>Bệnh viện</th>
+
+<th>Số người</th>
+
+</tr>
+
+</thead>
+
+<tbody id="reportBenhVienBody">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- SheetJS -->
+
+<script
+src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"
+></script>
+
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyHKr32h5l-H4hBeWzmeu1NnMW6jOEw66dvmPePLmvdbLJXnoj6vgf21g1z1OZdM86hJQ/exec";
+
+
+let ADMIN_USER = "";
+let ADMIN_PASS = "";
+
+let adminData = {
+  list: [],
+  reportBoPhan: [],
+  reportBenhVien: []
+};
+
+
+/* ========================================================
+   API POST
+======================================================== */
+
+async function postAdmin(data) {
+
+  const response = await fetch(API_URL, {
+
+    method: "POST",
+
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+
+    body: JSON.stringify({
+      ...data,
+
+      u: ADMIN_USER,
+      p: ADMIN_PASS
+    })
+
+  });
+
+  return await response.json();
+}
+
+
+/* ========================================================
+   ĐĂNG NHẬP ADMIN
+======================================================== */
+
+async function adminLogin() {
+
+  const u =
+    document.getElementById("adminUser").value.trim();
+
+  const p =
+    document.getElementById("adminPass").value;
+
+  if (!u || !p) {
+
+    alert("Vui lòng nhập tài khoản và mật khẩu!");
+
+    return;
+  }
+
+  ADMIN_USER = u;
+  ADMIN_PASS = p;
+
+  try {
+
+    const res = await postAdmin({
+      action: "adminLogin"
+    });
+
+    if (!res.success) {
+
+      alert(res.msg || "Đăng nhập thất bại!");
+
+      ADMIN_USER = "";
+      ADMIN_PASS = "";
+
+      return;
+    }
+
+    renderAdmin(res);
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      "Không thể kết nối Apps Script!"
+    );
+
+  }
+
+}
+
+
+/* ========================================================
+   RENDER ADMIN
+======================================================== */
+
+function renderAdmin(res) {
+
+  adminData = res;
+
+  document.getElementById("emp").innerText =
+    res.totalEmployees || 0;
+
+  const registered =
+    res.list
+      ? res.list.length
+      : 0;
+
+  document.getElementById("reg").innerText =
+    registered;
+
+  document.getElementById("totalReg").innerText =
+    registered;
+
+
+  // Nếu Apps Script chưa trả totalEmployees
+  // thì giữ cách tính an toàn
+  if (!res.totalEmployees) {
+
+    document.getElementById("emp").innerText =
+      "—";
+
+    document.getElementById("remain").innerText =
+      "—";
+
+  } else {
+
+    document.getElementById("remain").innerText =
+      Math.max(
+        0,
+        res.totalEmployees - registered
+      );
+  }
+
+
+  // ============================================
+  // TRẠNG THÁI
+  // ============================================
+
+  const badge =
+    document.getElementById("statusBadge");
+
+  const statusText =
+    document.getElementById("statusText");
+
+
+  if (res.registrationOpen) {
+
+    badge.className =
+      "badge bg-success";
+
+    badge.innerText =
+      "OPEN";
+
+    statusText.innerHTML =
+      '<span class="text-success fw-bold">🟢 ĐANG MỞ ĐĂNG KÝ</span>';
+
+  } else {
+
+    badge.className =
+      "badge bg-danger";
+
+    badge.innerText =
+      "CLOSED";
+
+    statusText.innerHTML =
+      '<span class="text-danger fw-bold">🔴 ĐÃ HẾT HẠN</span>';
+  }
+
+
+  // ============================================
+  // THỜI HẠN
+  // ============================================
+
+  if (res.thoiHan) {
+
+    let d =
+      new Date(
+        String(res.thoiHan)
+          .replace(" ", "T")
+      );
+
+    if (!isNaN(d.getTime())) {
+
+      d.setMinutes(
+        d.getMinutes() -
+        d.getTimezoneOffset()
+      );
+
+      document.getElementById(
+        "inputNewDate"
+      ).value =
+        d.toISOString().slice(0,16);
+    }
+  }
+
+
+  renderRegistered(res.list || []);
+
+  renderReport(
+    "reportBoPhanBody",
+    res.reportBoPhan || []
+  );
+
+  renderReport(
+    "reportBenhVienBody",
+    res.reportBenhVien || []
+  );
+
+}
+
+
+/* ========================================================
+   DANH SÁCH ĐĂNG KÝ
+======================================================== */
+
+function renderRegistered(list) {
+
+  const tbody =
+    document.getElementById(
+      "tableBodyAdmin"
+    );
+
+  if (!list.length) {
+
+    tbody.innerHTML =
+      '<tr>' +
+      '<td colspan="9" class="text-center text-muted">' +
+      'Chưa có ai đăng ký' +
+      '</td>' +
+      '</tr>';
+
+    return;
+  }
+
+
+  tbody.innerHTML = "";
+
+
+  list.forEach((item, index) => {
+
+    const tr =
+      document.createElement("tr");
+
+
+    tr.innerHTML = `
+
+      <td>${index + 1}</td>
+
+      <td>${escapeHtml(item.tg)}</td>
+
+      <td>${escapeHtml(item.manv)}</td>
+
+      <td class="fw-bold">
+        ${escapeHtml(item.hoten)}
+      </td>
+
+      <td>
+        ${escapeHtml(item.bophan)}
+      </td>
+
+      <td>
+        ${escapeHtml(item.kcbcu)}
+      </td>
+
+      <td>
+        ${escapeHtml(item.bvmoi)}
+      </td>
+
+      <td>
+        ${escapeHtml(item.mabv)}
+      </td>
+
+      <td>
+
+        <button
+          class="btn btn-sm btn-outline-danger"
+          onclick="deleteOneDangKy(${item.rowNumber})"
+        >
+          🗑️ Xóa
+        </button>
+
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+
+  });
+
+}
+
+
+/* ========================================================
+   REPORT
+======================================================== */
+
+function renderReport(id, list) {
+
+  const tbody =
+    document.getElementById(id);
+
+  if (!list.length) {
+
+    tbody.innerHTML =
+      '<tr><td colspan="2" class="text-center">' +
+      'Không có dữ liệu' +
+      '</td></tr>';
+
+    return;
+  }
+
+
+  tbody.innerHTML =
+    list.map(item => `
+
+      <tr>
+
+        <td>
+          ${escapeHtml(item.name)}
+        </td>
+
+        <td>
+          <span class="badge bg-primary">
+            ${item.count}
+          </span>
+        </td>
+
+      </tr>
+
+    `).join("");
+
+}
+
+
+/* ========================================================
+   XÓA 1 NGƯỜI
+======================================================== */
+
+async function deleteOneDangKy(rowNumber) {
+
+  if (
+    !confirm(
+      "Bạn chắc chắn muốn xóa đăng ký này?"
+    )
+  ) {
+    return;
+  }
+
+
+  try {
+
+    const res =
+      await postAdmin({
+
+        action:
+          "deleteDangKy",
+
+        rowNumber:
+          rowNumber
+      });
+
+
+    if (!res.success) {
+
+      alert(
+        res.msg ||
+        "Xóa thất bại!"
+      );
+
+      return;
+    }
+
+
+    alert("✅ Đã xóa!");
+
+    reloadAdmin();
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      "Không thể kết nối máy chủ!"
+    );
+
+  }
+
+}
+
+
+/* ========================================================
+   XÓA TOÀN BỘ
+======================================================== */
+
+async function deleteAllDangKy() {
+
+  if (
+    !confirm(
+      "⚠️ CẢNH BÁO!\n\n" +
+      "Bạn có chắc chắn muốn XÓA TOÀN BỘ danh sách đăng ký?\n\n" +
+      "Thao tác này không thể hoàn tác!"
+    )
+  ) {
+    return;
+  }
+
+
+  // Xác nhận lần 2
+  const text =
+    prompt(
+      'Nhập "XOA" để xác nhận xóa toàn bộ:'
+    );
+
+  if (text !== "XOA") {
+
+    alert("Đã hủy thao tác.");
+
+    return;
+  }
+
+
+  try {
+
+    const res =
+      await postAdmin({
+        action:
+          "deleteAllDangKy"
+      });
+
+
+    if (!res.success) {
+
+      alert(
+        res.msg ||
+        "Xóa thất bại!"
+      );
+
+      return;
+    }
+
+
+    alert(
+      "✅ Đã xóa toàn bộ danh sách!"
+    );
+
+    reloadAdmin();
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      "Không thể kết nối máy chủ!"
+    );
+
+  }
+
+}
+
+
+/* ========================================================
+   DOWNLOAD EXCEL
+======================================================== */
+
+function downloadExcel() {
+
+  const list =
+    adminData.list || [];
+
+
+  if (!list.length) {
+
+    alert(
+      "Không có dữ liệu để xuất Excel!"
+    );
+
+    return;
+  }
+
+
+  const rows =
+    list.map((item, index) => ({
+
+      "STT":
+        index + 1,
+
+      "Thời gian":
+        item.tg || "",
+
+      "Mã NV":
+        item.manv || "",
+
+      "Họ tên":
+        item.hoten || "",
+
+      "Bộ phận":
+        item.bophan || "",
+
+      "Chức vụ":
+        item.chucvu || "",
+
+      "KCB cũ":
+        item.kcbcu || "",
+
+      "Bệnh viện mới":
+        item.bvmoi || "",
+
+      "Mã BV mới":
+        item.mabv || ""
+
+    }));
+
+
+  const ws =
+    XLSX.utils.json_to_sheet(rows);
+
+
+  // Độ rộng cột
+  ws["!cols"] = [
+
+    { wch: 6 },
+    { wch: 20 },
+    { wch: 15 },
+    { wch: 30 },
+    { wch: 25 },
+    { wch: 25 },
+    { wch: 45 },
+    { wch: 45 },
+    { wch: 15 }
+
+  ];
+
+
+  const wb =
+    XLSX.utils.book_new();
+
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    ws,
+    "DangKyMoi"
+  );
+
+
+  const now =
+    new Date();
+
+
+  const filename =
+    "DanhSachDangKyMoi_" +
+    now.getFullYear() +
+    "_" +
+    String(now.getMonth() + 1).padStart(2,"0") +
+    "_" +
+    String(now.getDate()).padStart(2,"0") +
+    ".xlsx";
+
+
+  XLSX.writeFile(
+    wb,
+    filename
+  );
+
+}
+
+
+/* ========================================================
+   UPLOAD EXCEL
+======================================================== */
+
+async function uploadExcel(type) {
+
+  let inputId = "";
+
+  let action = "";
+
+
+  if (type === "DSCNV") {
+
+    inputId =
+      "fileDSCNV";
+
+    action =
+      "uploadDSCNV";
+
+  }
+
+
+  if (type === "Benhvien") {
+
+    inputId =
+      "fileBenhvien";
+
+    action =
+      "uploadBenhvien";
+
+  }
+
+
+  if (type === "DKCu") {
+
+    inputId =
+      "fileDKCu";
+
+    action =
+      "uploadDKCu";
+
+  }
+
+
+  const input =
+    document.getElementById(
+      inputId
+    );
+
+
+  if (
+    !input.files ||
+    !input.files.length
+  ) {
+
+    alert(
+      "Vui lòng chọn file Excel!"
+    );
+
+    return;
+  }
+
+
+  const file =
+    input.files[0];
+
+
+  if (
+    !confirm(
+      "Upload file này sẽ THAY TOÀN BỘ dữ liệu sheet " +
+      type +
+      ".\n\nBạn có chắc chắn?"
+    )
+  ) {
+    return;
+  }
+
+
+  try {
+
+    const buffer =
+      await file.arrayBuffer();
+
+
+    const workbook =
+      XLSX.read(
+        buffer,
+        {
+          type: "array"
+        }
+      );
+
+
+    const firstSheet =
+      workbook.Sheets[
+        workbook.SheetNames[0]
+      ];
+
+
+    const rows =
+      XLSX.utils.sheet_to_json(
+        firstSheet,
+        {
+          header: 1,
+          defval: ""
+        }
+      );
+
+
+    if (!rows.length) {
+
+      alert(
+        "File Excel không có dữ liệu!"
+      );
+
+      return;
+    }
+
+
+    // ==========================================
+    // Gửi lên Apps Script
+    // ==========================================
+
+    alert(
+      "Đang upload " +
+      rows.length +
+      " dòng..."
+    );
+
+
+    const res =
+      await postAdmin({
+
+        action:
+          action,
+
+        rows:
+          rows
+
+      });
+
+
+    if (!res.success) {
+
+      alert(
+        "❌ " +
+        (res.msg ||
+        "Upload thất bại!")
+      );
+
+      return;
+    }
+
+
+    alert(
+      "✅ " +
+      res.msg
+    );
+
+
+    input.value = "";
+
+    reloadAdmin();
+
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      "Không đọc được file Excel!"
+    );
+
+  }
+
+}
+
+
+/* ========================================================
+   LOAD LẠI ADMIN
+======================================================== */
+
+async function reloadAdmin() {
+
+  try {
+
+    const res =
+      await postAdmin({
+        action:
+          "adminLogin"
+      });
+
+
+    if (!res.success) {
+
+      alert(
+        res.msg ||
+        "Phiên đăng nhập không hợp lệ!"
+      );
+
+      return;
+    }
+
+
+    renderAdmin(res);
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      "Không thể tải lại dữ liệu!"
+    );
+
+  }
+
+}
+
+
+/* ========================================================
+   LƯU THỜI HẠN
+======================================================== */
+
+document
+.getElementById("btnSaveDate")
+.addEventListener(
+  "click",
+  async function() {
+
+    const value =
+      document.getElementById(
+        "inputNewDate"
+      ).value;
+
+
+    if (!value) {
+
+      alert(
+        "Vui lòng chọn ngày giờ!"
+      );
+
+      return;
+    }
+
+
+    const d =
+      new Date(value);
+
+
+    const formatted =
+      d.getFullYear() +
+      "-" +
+      String(
+        d.getMonth() + 1
+      ).padStart(2,"0") +
+      "-" +
+      String(
+        d.getDate()
+      ).padStart(2,"0") +
+      " " +
+      String(
+        d.getHours()
+      ).padStart(2,"0") +
+      ":" +
+      String(
+        d.getMinutes()
+      ).padStart(2,"0") +
+      ":00";
+
+
+    try {
+
+      const res =
+        await postAdmin({
+
+          action:
+            "updateThoiHan",
+
+          newDate:
+            formatted
+
+        });
+
+
+      if (!res.success) {
+
+        alert(
+          res.msg ||
+          "Không cập nhật được!"
+        );
+
+        return;
+      }
+
+
+      alert(
+        "✅ Đã cập nhật thời hạn!"
+      );
+
+
+      reloadAdmin();
+
+
+    } catch (err) {
+
+      console.error(err);
+
+      alert(
+        "Không thể kết nối máy chủ!"
+      );
+
+    }
+
+  }
+);
+
+
+/* ========================================================
+   ESCAPE HTML
+======================================================== */
+
+function escapeHtml(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "";
+  }
+
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* ========================================================
+   LOGIN MODAL
+   Nếu admin.html của bạn có form login riêng,
+   gọi adminLogin() khi nhấn nút.
+======================================================== */
+
+</script>
+
+</body>
+</html>
