@@ -234,31 +234,80 @@
         return response.json();
       })
       .then(data => {
-        if (data.error) {
-          $("#loading").html('<span class="text-danger">Lỗi hệ thống: ' + data.error + '</span>');
-          return;
-        }
-        db = data;
-        $("#loading").hide();
-        
-        if (data.thoiHan) {
-          let dateStr = data.thoiHan.toString().replace(" ", "T");
-          let hanCuoi = new Date(dateStr);
-          let homNay = new Date();
-          
-          let d = new Date(data.thoiHan);
-          let fDate = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
-          $("#text-han-cuoi").html('<i class="far fa-clock me-1"></i> Hạn cuối: ' + fDate);
 
-          if (homNay > hanCuoi) {
-            $("#boxHetHan").show();
-            $("#mainContainer").hide();
-            return;
+          if (data.error) {
+              $("#loading").html(
+                  '<span class="text-danger">Lỗi hệ thống: ' +
+                  data.error +
+                  '</span>'
+              );
+              return;
           }
-        }
-
-        $("#formDangKy").fadeIn();
-        initAutocompletes();
+      
+          db = data;
+      
+          $("#loading").hide();
+      
+          // ==========================================
+          // HIỂN THỊ HẠN
+          // ==========================================
+          if (data.thoiHan) {
+      
+              let dateStr =
+                  data.thoiHan
+                      .toString()
+                      .replace(" ", "T");
+      
+              let hanCuoi =
+                  new Date(dateStr);
+      
+              let fDate =
+                  ("0" + hanCuoi.getDate()).slice(-2) +
+                  "/" +
+                  ("0" + (hanCuoi.getMonth() + 1)).slice(-2) +
+                  "/" +
+                  hanCuoi.getFullYear() +
+                  " " +
+                  ("0" + hanCuoi.getHours()).slice(-2) +
+                  ":" +
+                  ("0" + hanCuoi.getMinutes()).slice(-2);
+      
+              $("#text-han-cuoi").html(
+                  '<i class="far fa-clock me-1"></i> Hạn cuối: ' +
+                  fDate
+              );
+      
+              // ==========================================
+              // HẾT HẠN:
+              // VẪN HIỆN FORM ĐỂ TRA CỨU
+              // NHƯNG KHÓA NÚT ĐĂNG KÝ
+              // ==========================================
+              if (new Date() > hanCuoi) {
+      
+                  $("#boxHetHan").show();
+      
+                  $("#formDangKy").show();
+      
+                  $("#btnSubmit")
+                      .prop("disabled", true)
+                      .removeClass("btn-primary")
+                      .addClass("btn-secondary")
+                      .text("ĐÃ HẾT HẠN ĐĂNG KÝ");
+      
+                  initAutocompletes();
+      
+                  return;
+              }
+          }
+      
+          // ==========================================
+          // CÒN HẠN
+          // ==========================================
+          $("#boxHetHan").hide();
+      
+          $("#formDangKy").fadeIn();
+      
+          initAutocompletes();
       })
       .catch(error => {
         console.error(error);
